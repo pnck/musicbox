@@ -1,16 +1,19 @@
 bilibili-song-selecting
 =================
 
-##基于[MusicBox](https://github.com/darknessomi/musicbox)做了一点微小的改动，满足自己微小的一时兴起
+### 基于[MusicBox](https://github.com/darknessomi/musicbox)做了一点微小的改动，变成一个B站直播的点歌程序，以满足自己微小的一时兴起
+**由于只是微小的修改，所以安装脚本都没有改动，想测试可以clone到本地运行** `bilibili_song_selecting.py` 
+用法：python3 bilibili_song_selecting.py [直播间号] ['endless']
+两个参数可以调换
 
 如果对于命令行版的网易云音乐感兴趣，请移步原repo star&follow:
 
 https://github.com/darknessomi/musicbox
 
 
+以下为原readme
 -----------
 
-原readme
 
 
 #### [感谢](https://github.com/darknessomi/musicbox/graphs/contributors)为 MusicBox 的开发付出过努力的每一个人！
