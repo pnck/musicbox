@@ -74,8 +74,11 @@ def endless():
     global player
     global g_playing
     g_playing = True
+    datalist = {}
+    player.new_player_list('songs', '点歌列表', datalist, -1)
     player.append_songs(find_song(default_song_id))
-    player.play_and_pause(0)
+    player.next()
+    #print(player.songs)
 
 def start():
     room_id = ''
