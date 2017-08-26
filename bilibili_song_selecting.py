@@ -30,6 +30,7 @@ default_room_id = 946041
 
 g_playing = False
 
+
 def find_song(s):
     try:
         data = api.search(s, stype=1)
@@ -67,7 +68,8 @@ def quit():
     global player
     player.playing_flag = False
     global g_playing
-    g_playing  = False
+    g_playing = False
+
 
 def endless():
     print('播放列表为空，自动播放默认bgm')
@@ -78,11 +80,13 @@ def endless():
     player.new_player_list('songs', '点歌列表', datalist, -1)
     player.append_songs(find_song(default_song_id))
     player.next()
-    #print(player.songs)
+    first_play = True
+    # print(player.songs)
+
 
 def start():
     room_id = ''
-    for i,s in enumerate(sys.argv):
+    for i, s in enumerate(sys.argv):
         if i > 2:
             break
         try:
@@ -91,8 +95,8 @@ def start():
         except:
             room_id = str(default_room_id)
         if s == 'endless':
-           player.end_callback = endless
-           continue
+            player.end_callback = endless
+            continue
     if player.end_callback is None:
         player.end_callback = quit
 
@@ -120,7 +124,7 @@ def start():
         if data:
             msgs = {}
             [msgs.update({time.mktime(time.strptime(msg['timeline'],
-                                                    '%Y-%m-%d %H:%M:%S')):(msg['nickname'],msg['text'])}) for msg in data]
+                                                    '%Y-%m-%d %H:%M:%S')):(msg['nickname'], msg['text'])}) for msg in data]
             msglist = [(time, content) for time, content in map(
                 lambda k:(k, msgs.get(k)), sorted(msgs.keys()))]
             # find new added msgs
@@ -131,8 +135,8 @@ def start():
                 m = re.match('^点歌 .*', msg[1][1])  # msg[content]['text']
                 if m:
                     s = m.group()[3:].strip()
-                    latest_time = msg[0] # time
-                    print('%s 点歌: %s' % (msg[1][0],s))
+                    latest_time = msg[0]  # time
+                    print('%s 点歌: %s' % (msg[1][0], s))
                     new_song = find_song(s[:60])
                     player.append_songs(new_song)
                     log.info('append new song %s to list' % (new_song,))
@@ -141,13 +145,14 @@ def start():
                         time.sleep(0.5)
                     first_play = False
                     continue
-                m = re.match('^切歌',msg[1][1])# msg[content]['text']
+                m = re.match('^切歌', msg[1][1])  # msg[content]['text']
                 if m:
                     latest_time = msg[0]
                     player.next()
                     time.sleep(0.5)
 
         time.sleep(0.8)
+
 
 if __name__ == '__main__':
     try:
