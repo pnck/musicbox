@@ -231,7 +231,7 @@ class Player(object):
     def recall(self):
         if self.info['idx'] >= len(self.info[
                 'player_list']) and self.end_callback is not None:
-            log.debug('Callback')
+            log.debug('Callback func:%s' % (self.end_callback,))
             self.end_callback()
         if self.info['idx'] < 0 or self.info['idx'] >= len(self.info[
                 'player_list']):
