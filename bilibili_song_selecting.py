@@ -69,22 +69,29 @@ def quit():
     global g_playing
     g_playing  = False
 
+def endless():
+    print('播放列表为空，自动播放默认bgm')
+    global player
+    global g_playing
+    g_playing = True
+    player.append_songs(find_song(default_song_id))
+    player.play_and_pause(0)
 
-
-if __name__ == '__main__':
-    player.end_callback = quit
-    datalist = {}
-    player.new_player_list('songs', '点歌列表', datalist, -1)
-    #__import__('time').sleep(5)
-    # player.next()
-    #__import__('time').sleep(5)
-    #print (player.songs[str(player.playing_id)]['lyric'])
-    # player.popen_recall(callback,song).join()
+def start():
     room_id = ''
-    try:
-        room_id = str(int(sys.argv[1]))
-    except:
-        room_id = str(default_room_id)
+    for i,s in enumerate(sys.argv):
+        if i > 2:
+            break
+        try:
+            room_id = str(int(s))
+            continue
+        except:
+            room_id = str(default_room_id)
+        if s == 'endless':
+           player.end_callback = endless
+           continue
+    if player.end_callback is None:
+        player.end_callback = quit
 
     data = json.loads(urlopen(Request('https://api.live.bilibili.com/ajax/msg',
                                       b'roomid=' + room_id.encode('utf8'))).read().decode('utf-8'))['data']['room']
@@ -97,7 +104,8 @@ if __name__ == '__main__':
             lambda k:(k, msgs.get(k)), sorted(msgs.keys()))]
         latest_time = msglist[-1][0]
 
-    player.end_callback = quit
+    datalist = {}
+    player.new_player_list('songs', '点歌列表', datalist, -1)
     player.append_songs(find_song(default_song_id))
     player.play_and_pause(0)
     first_play = True
@@ -137,3 +145,11 @@ if __name__ == '__main__':
                     time.sleep(0.5)
 
         time.sleep(0.8)
+
+if __name__ == '__main__':
+    try:
+        start()
+    except:
+        log.debug('unusual quit')
+        quit()
+        exit(0)
