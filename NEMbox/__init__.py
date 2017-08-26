@@ -16,7 +16,6 @@ import traceback
 import argparse
 import sys
 
-from .menu import Menu
 version = "0.2.4.1"
 
 
@@ -48,4 +47,5 @@ def start():
 
 
 if __name__ == '__main__':
+    from .menu import Menu
     start()

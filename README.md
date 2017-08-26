@@ -1,5 +1,16 @@
-NetEase-MusicBox
+bilibili-song-selecting
 =================
+
+##基于[MusicBox](https://github.com/darknessomi/musicbox)做了一点微小的改动，满足自己微小的一时兴起
+
+如果对于命令行版的网易云音乐感兴趣，请移步原repo star&follow:
+
+https://github.com/darknessomi/musicbox
+
+
+-----------
+
+原readme
 
 
 #### [感谢](https://github.com/darknessomi/musicbox/graphs/contributors)为 MusicBox 的开发付出过努力的每一个人！

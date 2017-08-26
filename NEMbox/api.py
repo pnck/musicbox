@@ -153,13 +153,13 @@ def geturl(song):
 
 def geturl_new_api(song):
     br_to_quality = {128000: 'MD 128k', 320000: 'HD 320k'}
-    alter = NetEase().songs_detail_new_api([song['id']])[0]
+    alter = NetEaseAPI().songs_detail_new_api([song['id']])[0]
     url = alter['url']
     quality = br_to_quality.get(alter['br'], '')
     return url, quality
 
 
-class NetEase(object):
+class NetEaseAPI(object):
 
     def __init__(self):
         self.header = {
@@ -707,7 +707,7 @@ class NetEase(object):
 
 
 if __name__ == '__main__':
-    ne = NetEase()
+    ne = NetEaseAPI()
     print(geturl_new_api(ne.songs_detail([27902910])[0]))  # MD 128k, fallback
     print(ne.songs_detail_new_api([27902910])[0]['url'])
     print(ne.songs_detail([405079776])[0]['mp3Url'])  # old api

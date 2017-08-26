@@ -25,12 +25,13 @@ import random
 import re
 import platform
 
-from .ui import Ui
+#from .ui import Ui
 from .storage import Storage
-from .api import NetEase
+from .api import NetEaseAPI
 from .cache import Cache
 from .config import Config
 from . import logger
+from . import utils
 
 log = logger.getLogger(__name__)
 
@@ -39,7 +40,7 @@ class Player(object):
 
     def __init__(self):
         self.config = Config()
-        self.ui = Ui()
+        #self.ui = Ui()
         self.popen_handler = None
         # flag stop, prevent thread start
         self.playing_flag = False
@@ -109,7 +110,7 @@ class Player(object):
                 elif strout[:2] == '@E':
                     # get a alternative url from new api
                     sid = popenArgs['song_id']
-                    new_url = NetEase().songs_detail_new_api([sid])[0]['url']
+                    new_url = NetEaseAPI().songs_detail_new_api([sid])[0]['url']
                     if new_url is None:
                         log.warning(('Song {} is unavailable '
                                      'due to copyright issue.').format(sid))
@@ -174,8 +175,8 @@ class Player(object):
                 self.songs[str(self.playing_id)]['lyric'] = []
             if len(self.songs[str(self.playing_id)]['lyric']) > 0:
                 return
-            netease = NetEase()
-            lyric = netease.song_lyric(self.playing_id)
+            api = NetEaseAPI()
+            lyric = api.song_lyric(self.playing_id)
             if lyric == [] or lyric == '未找到歌词':
                 return
             lyric = lyric.split('\n')
@@ -187,8 +188,8 @@ class Player(object):
                 self.songs[str(self.playing_id)]['tlyric'] = []
             if len(self.songs[str(self.playing_id)]['tlyric']) > 0:
                 return
-            netease = NetEase()
-            tlyric = netease.song_tlyric(self.playing_id)
+            api = NetEaseAPI()
+            tlyric = api.song_tlyric(self.playing_id)
             if tlyric == [] or tlyric == '未找到歌词翻译':
                 return
             tlyric = tlyric.split('\n')
@@ -240,12 +241,13 @@ class Player(object):
         self.playing_flag = True
         self.pause_flag = False
         item = self.songs[self.info['player_list'][self.info['idx']]]
-        self.ui.build_playinfo(item['song_name'], item['artist'],
-                               item['album_name'], item['quality'],
-                               time.time())
+        #self.ui.build_playinfo(item['song_name'], item['artist'],
+        #                       item['album_name'], item['quality'],
+        #                       time.time())
         if self.notifier:
-            self.ui.notify('正在播放', item['song_name'],
-                           item['album_name'], item['artist'])
+            body = '%s\n专辑 %s 歌手 %s' % (item['song_name'], item['album_name'], item['artist'])
+            content = '正在播放' + ': ' + body
+            utils.notify(content)
         self.playing_id = item['song_id']
         self.playing_name = item['song_name']
         self.popen_recall(self.recall, item)
@@ -339,12 +341,12 @@ class Player(object):
             return
 
         item = self.songs[self.info['player_list'][self.info['idx']]]
-        self.ui.build_playinfo(item['song_name'],
-                               item['artist'],
-                               item['album_name'],
-                               item['quality'],
-                               time.time(),
-                               pause=True)
+        #self.ui.build_playinfo(item['song_name'],
+        #                       item['artist'],
+        #                       item['album_name'],
+        #                       item['quality'],
+        #                       time.time(),
+        #                       pause=True)
 
     def resume(self):
         self.pause_flag = False
@@ -356,9 +358,9 @@ class Player(object):
             return
 
         item = self.songs[self.info['player_list'][self.info['idx']]]
-        self.ui.build_playinfo(item['song_name'], item['artist'],
-                               item['album_name'], item['quality'],
-                               time.time())
+        #self.ui.build_playinfo(item['song_name'], item['artist'],
+        #                       item['album_name'], item['quality'],
+        #                       time.time())
         self.playing_id = item['song_id']
         self.playing_name = item['song_name']
 
@@ -501,7 +503,7 @@ class Player(object):
             self.popen_handler.stdin.flush()
         except IOError as e:
             log.error(e)
-
+    '''
     def update_size(self):
         self.ui.update_size()
         if not 0 <= self.info['idx'] < len(self.info['player_list']):
@@ -519,7 +521,7 @@ class Player(object):
                                        item['album_name'], item['quality'],
                                        time.time(),
                                        pause=True)
-
+    '''
     def cacheSong1time(self, song_id, song_name, artist, song_url):
         def cacheExit(song_id, path):
             self.songs[str(song_id)]['cache'] = path

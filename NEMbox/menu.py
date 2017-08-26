@@ -26,7 +26,7 @@ import locale
 import xml.etree.cElementTree as ET
 
 
-from .api import NetEase
+from .api import NetEaseAPI
 from .player import Player
 from .ui import Ui
 from .osdlyrics import show_lyrics_new_process
@@ -119,7 +119,7 @@ class Menu(object):
         self.player.playing_song_changed_callback = self.song_changed_callback
         self.cache = Cache()
         self.ui = Ui()
-        self.netease = NetEase()
+        self.netease = NetEaseAPI()
         self.screen = curses.initscr()
         self.screen.keypad(1)
         self.step = 10

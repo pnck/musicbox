@@ -18,7 +18,7 @@ import hashlib
 import re
 import curses
 
-from .api import NetEase
+from .api import NetEaseAPI
 from .scrollstring import truelen, scrollstring
 from .storage import Storage
 from .config import Config
@@ -55,7 +55,7 @@ class Ui(object):
         # charactor break buffer
         curses.cbreak()
         self.screen.keypad(1)
-        self.netease = NetEase()
+        self.neteaseApi = NetEaseAPI()
 
         curses.start_color()
         if Config().get_item('curses_transparency'):
@@ -492,14 +492,14 @@ class Ui(object):
 
     def build_search(self, stype):
         self.screen.timeout(-1)
-        netease = self.netease
+        neteaseApi = self.neteaseApi
         if stype == 'songs':
             song_name = self.get_param('搜索歌曲：')
             if song_name == '/return':
                 return []
             else:
                 try:
-                    data = netease.search(song_name, stype=1)
+                    data = neteaseApi.search(song_name, stype=1)
                     song_ids = []
                     if 'songs' in data['result']:
                         if 'mp3Url' in data['result']['songs']:
@@ -511,8 +511,8 @@ class Ui(object):
                             for i in range(0, len(data['result']['songs'])):
                                 song_ids.append(data['result']['songs'][i][
                                     'id'])
-                            songs = netease.songs_detail(song_ids)
-                        return netease.dig_info(songs, 'songs')
+                            songs = neteaseApi.songs_detail(song_ids)
+                        return neteaseApi.dig_info(songs, 'songs')
                 except Exception as e:
                     log.error(e)
                     return []
@@ -523,10 +523,10 @@ class Ui(object):
                 return []
             else:
                 try:
-                    data = netease.search(artist_name, stype=100)
+                    data = neteaseApi.search(artist_name, stype=100)
                     if 'artists' in data['result']:
                         artists = data['result']['artists']
-                        return netease.dig_info(artists, 'artists')
+                        return neteaseApi.dig_info(artists, 'artists')
                 except Exception as e:
                     log.error(e)
                     return []
@@ -537,10 +537,10 @@ class Ui(object):
                 return []
             else:
                 try:
-                    data = netease.search(albums_name, stype=10)
+                    data = neteaseApi.search(albums_name, stype=10)
                     if 'albums' in data['result']:
                         albums = data['result']['albums']
-                        return netease.dig_info(albums, 'albums')
+                        return neteaseApi.dig_info(albums, 'albums')
                 except Exception as e:
                     log.error(e)
                     return []
@@ -551,10 +551,10 @@ class Ui(object):
                 return []
             else:
                 try:
-                    data = netease.search(search_playlist, stype=1000)
+                    data = neteaseApi.search(search_playlist, stype=1000)
                     if 'playlists' in data['result']:
                         playlists = data['result']['playlists']
-                        return netease.dig_info(playlists, 'top_playlists')
+                        return neteaseApi.dig_info(playlists, 'top_playlists')
                 except Exception as e:
                     log.error(e)
                     return []
@@ -565,7 +565,7 @@ class Ui(object):
         self.build_login_bar()
         local_account = self.get_account()
         local_password = hashlib.md5(self.get_password().encode('utf-8')).hexdigest()
-        login_info = self.netease.login(local_account, local_password)
+        login_info = self.neteaseApi.login(local_account, local_password)
         account = [local_account, local_password]
         if login_info['code'] != 200:
             x = self.build_login_error()
