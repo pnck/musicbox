@@ -63,6 +63,29 @@ def make_notify(summary, song, album, artist):
     utils.notify(content)
 
 
+def play_next_hook():
+    first_id_to_del = player.info['player_list'][0]
+    del player.info['player_list'][0]
+    del player.songs[first_id_to_del]
+    player.info['idx'] -= 1
+    show_playing_list_hook()
+
+
+def show_playing_list_hook():
+    song_ids = player.info['player_list']
+    play_list = map(player.songs.get, song_ids)
+    s = ''
+    for i, song in enumerate(play_list):
+        if i == 0:
+            s += '> '
+        else:
+            s += '  '
+        s += '[%d]:%s - %s\n' % (i, song['song_name'], song['artist'])[:40]
+    print('当前列表：\n' + s)
+    with open('/tmp/playinglist.txt', 'w') as f:
+        f.write('当前列表：\n' + s)
+
+
 def quit():
     print('quit...')
     global player
@@ -75,6 +98,7 @@ def endless():
     print('播放列表为空，自动播放默认bgm')
     global player
     global g_playing
+    global first_play
     g_playing = True
     datalist = {}
     player.new_player_list('songs', '点歌列表', datalist, -1)
@@ -85,6 +109,10 @@ def endless():
 
 
 def start():
+    global player
+    global g_playing
+    global first_play
+
     room_id = ''
     for i, s in enumerate(sys.argv):
         if i > 2:
@@ -99,6 +127,9 @@ def start():
             continue
     if player.end_callback is None:
         player.end_callback = quit
+
+    player.playing_song_changed_callback = play_next_hook
+    player.list_changed_callback = show_playing_list_hook
 
     data = json.loads(urlopen(Request('https://api.live.bilibili.com/ajax/msg',
                                       b'roomid=' + room_id.encode('utf8'))).read().decode('utf-8'))['data']['room']
@@ -136,7 +167,8 @@ def start():
                 if m:
                     s = m.group()[3:].strip()
                     latest_time = msg[0]  # time
-                    print('%s 点歌: %s' % (msg[1][0], s))
+                    print('[%s]:%s 点歌: %s' % (time.strftime(
+                        '%Y-%m-%d %H:%M:%S', time.localtime(time.time())), msg[1][0], s))
                     new_song = find_song(s[:60])
                     player.append_songs(new_song)
                     log.info('append new song %s to list' % (new_song,))
@@ -158,6 +190,7 @@ if __name__ == '__main__':
     try:
         start()
     except:
+        __import__('traceback').print_exc()
         log.debug('unusual quit')
         quit()
         exit(0)

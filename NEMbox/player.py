@@ -58,6 +58,7 @@ class Player(object):
         self.mpg123_parameters = self.config.get_item('mpg123_parameters')
         self.end_callback = None
         self.playing_song_changed_callback = None
+        self.list_changed_callback = None
 
     def popen_recall(self, onExit, popenArgs):
         '''
@@ -258,6 +259,9 @@ class Player(object):
             self.info['playing_list'].append(i)
         random.shuffle(self.info['playing_list'])
         self.info['ridx'] = 0
+        if self.list_changed_callback is not None:
+            log.debug('list_changed_callback')
+            self.list_changed_callback()
 
     def new_player_list(self, type, title, datalist, offset):
         self.info['player_list_type'] = type
@@ -275,6 +279,9 @@ class Player(object):
                 if (database_song['song_name'] != song['song_name'] or
                         database_song['quality'] != song['quality']):
                     self.songs[str(song['song_id'])] = song
+        if self.list_changed_callback is not None:
+            log.debug('list_changed_callback')
+            self.list_changed_callback()
 
     def append_songs(self, datalist):
         for song in datalist:
@@ -290,9 +297,13 @@ class Player(object):
                         song['cache'] = self.songs[str(song['song_id'])][
                             'cache']
                     self.songs[str(song['song_id'])] = song
+        if self.list_changed_callback is not None:
+            log.debug('list_changed_callback')
+            self.list_changed_callback()
         if len(datalist) > 0 and self.info['playing_mode'] == 3 or self.info[
                 'playing_mode'] == 4:
             self.generate_shuffle_playing_list()
+    
 
     def play_and_pause(self, idx):
         # if same playlists && idx --> same song :: pause/resume it
